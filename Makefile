@@ -74,6 +74,18 @@ endef
 FIRST_ARG := $(firstword $(MAKECMDGOALS))
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 
+# Convenience form for Gazebo SITL worlds:
+#   make px4_sitl gz_x500_mono_cam test_world
+# is rewritten to the generated CMake target:
+#   gz_x500_mono_cam_test_world
+ifeq ($(FIRST_ARG),px4_sitl)
+	ifneq ($(filter gz_%,$(firstword $(ARGS))),)
+		ifeq ($(words $(ARGS)),2)
+			override ARGS := $(firstword $(ARGS))_$(word 2,$(ARGS))
+		endif
+	endif
+endif
+
 # Get -j or --jobs argument as suggested in:
 # https://stackoverflow.com/a/33616144/8548472
 MAKE_PID := $(shell echo $$PPID)
